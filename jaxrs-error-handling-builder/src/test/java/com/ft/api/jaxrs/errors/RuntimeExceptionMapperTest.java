@@ -1,0 +1,93 @@
+package com.ft.api.jaxrs.errors;
+
+
+import com.google.common.base.Supplier;
+import com.sun.jersey.api.client.ClientResponse;
+import com.yammer.dropwizard.testing.ResourceTest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+
+/**
+ * RuntimeExceptionMapperTest
+ *
+ * @author Simon.Gibbs
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class RuntimeExceptionMapperTest extends ResourceTest {
+
+    @Mock
+    Supplier<String> mockBusinessLayer;
+
+
+    @Test
+    public void shouldConvertUnhandledRuntimeExceptions() {
+
+        when(mockBusinessLayer.get()).thenThrow(new NullPointerException("synthetic NPE"));
+
+        ClientResponse clientResponse = invokeMockResource();
+
+        assertThat(clientResponse.getStatus(),is(500));
+        assertThat(clientResponse.getEntity(ErrorEntity.class),instanceOf(ErrorEntity.class));
+
+    }
+
+    private ClientResponse invokeMockResource() {
+        return client()
+                .resource("/")
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get(ClientResponse.class);
+    }
+
+    @Test
+    public void shouldNotConvertProperlyWrappedExceptions() {
+
+        Response expectedResponse = ClientError.status(422).error("some error").response();
+        ErrorEntity expectedEntity = (ErrorEntity) expectedResponse.getEntity();
+
+        when(mockBusinessLayer.get()).thenThrow(new WebApplicationClientException(expectedResponse));
+
+        ClientResponse clientResponse = invokeMockResource();
+
+        ErrorEntity result = clientResponse.getEntity(ErrorEntity.class);
+
+        assertThat(result.getMessage(),is(expectedEntity.getMessage()));
+        assertThat(clientResponse.getStatus(),is(422));
+
+    }
+
+    @Override
+    protected void setUpResources() throws Exception {
+        addResource(new MockResource(mockBusinessLayer));
+        addProvider(RuntimeExceptionMapper.class);
+    }
+
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static class MockResource {
+
+        Supplier<String> businessLayer;
+
+        public MockResource(Supplier<String> bizLayer) {
+            this.businessLayer = bizLayer;
+        }
+
+        @GET
+        public String getString() {
+            return businessLayer.get();
+        }
+    }
+
+}
