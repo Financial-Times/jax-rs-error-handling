@@ -1,5 +1,6 @@
 package com.ft.api.jaxrs.errors;
 
+import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,30 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
         // skip processing of responses that are already standardised.
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
+
             if(response.getEntity() instanceof ErrorEntity) {
                 return response;
             }
+
+            if(response.getEntity() == null) {
+
+                String message = Objects.firstNonNull(exception.getMessage(),GENERIC_MESSAGE);
+
+                if(!GENERIC_MESSAGE.equals(message)) {
+                    LOG.warn("Surfaced exception message from unknown tier. Expected ErrorEntity from web tier.");
+                }
+                AbstractErrorBuilder<?,?> responseBuidler;
+                if(response.getStatus()<500) {
+                    responseBuidler = ClientError.status(response.getStatus());
+                } else {
+                    responseBuidler = ServerError.status(response.getStatus());
+                }
+
+                return responseBuidler.error(message).response();
+
+            }
+
+
         }
 
         // force a standard response

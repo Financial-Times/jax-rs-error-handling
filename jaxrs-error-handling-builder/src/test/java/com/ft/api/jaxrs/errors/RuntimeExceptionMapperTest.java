@@ -3,6 +3,7 @@ package com.ft.api.jaxrs.errors;
 
 import com.google.common.base.Supplier;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.yammer.dropwizard.testing.ResourceTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,18 +38,27 @@ public class RuntimeExceptionMapperTest extends ResourceTest {
 
         when(mockBusinessLayer.get()).thenThrow(new NullPointerException("synthetic NPE"));
 
-        ClientResponse clientResponse = invokeMockResource();
+        ClientResponse clientResponse = invokeGetMockResource();
 
         assertThat(clientResponse.getStatus(),is(500));
         assertThat(clientResponse.getEntity(ErrorEntity.class),instanceOf(ErrorEntity.class));
 
     }
 
-    private ClientResponse invokeMockResource() {
+    private ClientResponse invokeGetMockResource() {
+        return prepClientWithUrl()
+                .get(ClientResponse.class);
+    }
+
+    private ClientResponse invokePostMockResource() {
+        return prepClientWithUrl()
+                .post(ClientResponse.class);
+    }
+
+    private WebResource.Builder prepClientWithUrl() {
         return client()
                 .resource("/")
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(ClientResponse.class);
+                .accept(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Test
@@ -59,13 +69,22 @@ public class RuntimeExceptionMapperTest extends ResourceTest {
 
         when(mockBusinessLayer.get()).thenThrow(new WebApplicationClientException(expectedResponse));
 
-        ClientResponse clientResponse = invokeMockResource();
+        ClientResponse clientResponse = invokeGetMockResource();
 
         ErrorEntity result = clientResponse.getEntity(ErrorEntity.class);
 
         assertThat(result.getMessage(),is(expectedEntity.getMessage()));
         assertThat(clientResponse.getStatus(),is(422));
 
+    }
+
+    @Test
+    public void shouldNotChangeStatusCodeForMappingFailures() {
+
+        ClientResponse clientResponse = invokePostMockResource();
+
+        // not sure what Jersey generates, but it should be "method not allowed".
+        assertThat(clientResponse.getStatus(),is(405));
     }
 
     @Override
