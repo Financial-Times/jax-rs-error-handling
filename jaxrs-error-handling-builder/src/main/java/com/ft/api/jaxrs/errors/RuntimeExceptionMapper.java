@@ -25,14 +25,16 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
         // ensure exceptions are logged!
         LOG.error("unhandled exception", exception);
 
-        // skip processing of responses that are already standardised.
+
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
 
+            // skip processing of responses that are already standardised.
             if(response.getEntity() instanceof ErrorEntity) {
                 return response;
             }
 
+            // fill out null responses
             if(response.getEntity() == null) {
 
                 String message = Objects.firstNonNull(exception.getMessage(),GENERIC_MESSAGE);
