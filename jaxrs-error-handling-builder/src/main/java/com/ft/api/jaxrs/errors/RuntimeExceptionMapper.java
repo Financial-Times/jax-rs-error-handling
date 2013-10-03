@@ -29,34 +29,29 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
 
-            // skip processing of responses that are already standardised.
-            if(response.getEntity() instanceof ErrorEntity) {
+            // skip processing of responses that are already present.
+            if(response.getEntity() != null) {
                 return response;
             }
 
             // fill out null responses
-            if(response.getEntity() == null) {
+            String message = Objects.firstNonNull(exception.getMessage(),GENERIC_MESSAGE);
 
-                String message = Objects.firstNonNull(exception.getMessage(),GENERIC_MESSAGE);
-
-                if(!GENERIC_MESSAGE.equals(message)) {
-                    LOG.warn("Surfaced exception message from unknown tier. Expected ErrorEntity from web tier.");
-                }
-                AbstractErrorBuilder<?,?> responseBuidler;
-                if(response.getStatus()<500) {
-                    responseBuidler = ClientError.status(response.getStatus());
-                } else {
-                    responseBuidler = ServerError.status(response.getStatus());
-                }
-
-                return responseBuidler.error(message).response();
-
+            if(!GENERIC_MESSAGE.equals(message)) {
+                // Don't turn this off. You should be using ServerError and ClientError builders.
+                LOG.warn("Surfaced exception message from unknown tier. Expected ErrorEntity from web tier.");
+            }
+            AbstractErrorBuilder<?,?> responseBuilder;
+            if(response.getStatus()<500) {
+                responseBuilder = ClientError.status(response.getStatus());
+            } else {
+                responseBuilder = ServerError.status(response.getStatus());
             }
 
-
+            return responseBuilder.error(message).response();
         }
 
-        // force a standard response
+        // force a standard response for unexpected error types
         return ServerError.status(500).error(GENERIC_MESSAGE).response();
     }
 
