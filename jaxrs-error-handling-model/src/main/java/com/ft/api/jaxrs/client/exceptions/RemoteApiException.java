@@ -21,9 +21,16 @@ public class RemoteApiException extends ApiException {
     }
 
     public RemoteApiException(URI uri, String httpMethod, int status, ErrorEntity entity) {
-        super(entity.getMessage(),uri, httpMethod);
+        super(messageOrNull(entity),uri, httpMethod);
         this.status = status;
         this.entity = entity;
+    }
+
+    private static String messageOrNull(ErrorEntity entity) {
+        if(entity==null) {
+            return null;
+        }
+        return entity.getMessage();
     }
 
     public int getStatus() {
@@ -32,7 +39,7 @@ public class RemoteApiException extends ApiException {
 
     @Override
     public String toString() {
-        return toStringHelper().add("status", status).add("entity",entity).toString();
+        return toStringHelper().add("status", status).add("entity", entity).toString();
     }
 
 
