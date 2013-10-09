@@ -9,7 +9,12 @@ import java.net.URI;
  * @author Simon.Gibbs
  */
 public class ApiNetworkingException extends ApiException {
+
     public ApiNetworkingException(URI uri, String httpMethod) {
         super(uri, httpMethod);
+    }
+
+    public ApiNetworkingException(URI uri, String httpMethod, Throwable cause) {
+        super(uri, httpMethod, cause);
     }
 }

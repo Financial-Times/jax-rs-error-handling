@@ -21,6 +21,12 @@ public class ApiException extends RuntimeException {
         this.httpMethod = httpMethod;
     }
 
+    public ApiException(URI uri, String httpMethod, Throwable cause) {
+        super("Exception accessing: " + uri, cause);
+        this.uri = uri;
+        this.httpMethod = httpMethod;
+    }
+
     public ApiException(URI uri, String httpMethod) {
         this.uri = uri;
         this.httpMethod = httpMethod;
