@@ -16,7 +16,7 @@ public class ApiException extends RuntimeException {
 
 
     public ApiException(String message, URI uri, String httpMethod) {
-        super(message);
+        super(Objects.firstNonNull(message,reportUri(uri)));
         this.uri = uri;
         this.httpMethod = httpMethod;
     }
@@ -28,8 +28,13 @@ public class ApiException extends RuntimeException {
     }
 
     public ApiException(URI uri, String httpMethod) {
+        super(reportUri(uri));
         this.uri = uri;
         this.httpMethod = httpMethod;
+    }
+
+    private static String reportUri(URI uri) {
+        return "Problem accessing: " + uri;
     }
 
     public URI getUri() {
