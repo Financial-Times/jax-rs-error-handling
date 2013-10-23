@@ -12,9 +12,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
 
-
     private String message;
     private int statusCode;
+    private Object context;
 
     public AbstractErrorBuilder(int code) {
         checkStatusCode(code);
@@ -29,13 +29,26 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
         return (B) this;
     }
 
+    public B context(Object context) {
+        this.context = context;
+        return (B) this;
+    }
+
     public Response response() {
+
+        ErrorEntity entity = Errors.buildEntity(message,context);
+
+        if(entity==null) {
+            throw new NullPointerException("Configured ErrorEntityFactory failed to produce an entity");
+        }
+
         return Response.serverError()
                 .status(statusCode)
-                .entity(new ErrorEntity(message))
+                .entity(entity)
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();
     }
+
 
     public abstract E exception(Throwable cause);
 
