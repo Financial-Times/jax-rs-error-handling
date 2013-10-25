@@ -29,6 +29,23 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
         return (B) this;
     }
 
+    /**
+     * <p>Used with enumerated reason code systems. Extracts a message from the enum per</p>
+     *
+     * <code>error(enumeratedReason.toString())</code>
+     *
+     * <p>This is used where the business wants to sign off on and control messages, and allows
+     * developers to consolidate signed off messages in an enum with it's own Javadoc etc.
+     * and manage the messages in source control.</p>
+     *
+     * @param enumeratedReason any enum value
+     * @return the builder
+     */
+    public B reason(Enum<?> enumeratedReason) {
+        checkNotNull(enumeratedReason, "you must supply an enumeratedReason");
+        return error(enumeratedReason.toString());
+    }
+
     public B context(Object context) {
         this.context = context;
         return (B) this;
