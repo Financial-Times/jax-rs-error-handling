@@ -1,6 +1,8 @@
 package com.ft.api.jaxrs.errors;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,6 +25,8 @@ public class ClientError {
      */
     public static class ClientErrorBuilder extends AbstractErrorBuilder<WebApplicationClientException,ClientErrorBuilder > {
 
+        private static final Logger LOGGER = LoggerFactory.getLogger(ClientErrorBuilder.class);
+
         public ClientErrorBuilder(int statusCode) {
             super(statusCode);
         }
@@ -36,11 +40,13 @@ public class ClientError {
         @Override
         public WebApplicationClientException exception(Throwable cause) {
             checkNotNull(cause, "optional argument \"cause\" was unexpectedly null."); // surely null is impossible in a catch block!
+            LOGGER.warn(String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
             return new WebApplicationClientException(cause, response());
         }
 
         @Override
         public WebApplicationClientException exception() {
+            LOGGER.warn("message=\"{}\" status=\"{}\"",getMessage(), getStatusCode());
             return new WebApplicationClientException(response());
         }
 

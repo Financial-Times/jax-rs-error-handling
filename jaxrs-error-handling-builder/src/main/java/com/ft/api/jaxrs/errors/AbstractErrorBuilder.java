@@ -21,6 +21,14 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
         this.statusCode = code;
     }
 
+    protected String getMessage() {
+        return message;
+    }
+
+    protected int getStatusCode() {
+        return statusCode;
+    }
+
     protected abstract void checkStatusCode(int code);
 
     public B error(String message) {
@@ -59,6 +67,7 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
             throw new NullPointerException("Configured ErrorEntityFactory failed to produce an entity");
         }
 
+        //This is not a server error and the serverError method is used as a template to build a generic error response
         return Response.serverError()
                 .status(statusCode)
                 .entity(entity)

@@ -11,6 +11,16 @@ import javax.ws.rs.ext.ExceptionMapper;
 /**
  * RuntimeExceptionMapper
  *
+ * Converts any RuntimeException including those that result in a response code of
+ * - 415
+ * - 500
+ * - 503
+ * to a sensible response with a human-readable error message
+ *
+ * Some other exceptional scenarios like requests that result in a response code of
+ * - 400
+ * are not handled because Jersey constructs error responses.
+ *
  * @author Simon.Gibbs
  */
 public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException> {
