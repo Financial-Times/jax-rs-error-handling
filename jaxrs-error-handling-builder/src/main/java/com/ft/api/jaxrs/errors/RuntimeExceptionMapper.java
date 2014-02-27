@@ -1,6 +1,7 @@
 package com.ft.api.jaxrs.errors;
 
 import com.google.common.base.Objects;
+import com.sun.jersey.api.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +33,13 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
     @Override
     public Response toResponse(RuntimeException exception) {
 
+        if(exception instanceof NotFoundException) {
+            LOG.debug("404",exception);
+            return ClientError.status(404).error(exception.getMessage()).response();
+        }
+
         // ensure exceptions are logged!
         LOG.error("unhandled exception", exception);
-
 
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
