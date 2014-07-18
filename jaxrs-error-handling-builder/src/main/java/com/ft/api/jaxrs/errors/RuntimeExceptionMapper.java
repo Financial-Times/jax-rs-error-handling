@@ -38,9 +38,6 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
             return ClientError.status(404).error(exception.getMessage()).response();
         }
 
-        // ensure exceptions are logged!
-        LOG.error("unhandled exception", exception);
-
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
 
@@ -61,12 +58,15 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
                 responseBuilder = ClientError.status(response.getStatus());
             } else {
                 responseBuilder = ServerError.status(response.getStatus());
+                // ensure server error exceptions are logged!
+                LOG.error("Server error: ", exception);
             }
 
             return responseBuilder.error(message).response();
         }
 
-        // force a standard response for unexpected error types
+        // force a standard response for unexpected error types - which should also be logged
+        LOG.error("Server error, unexpected exception: ", exception);
         return ServerError.status(500).error(GENERIC_MESSAGE).response();
     }
 
