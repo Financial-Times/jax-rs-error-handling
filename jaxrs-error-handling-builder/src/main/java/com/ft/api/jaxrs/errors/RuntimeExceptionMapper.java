@@ -55,6 +55,9 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
             }
             AbstractErrorBuilder<?,?> responseBuilder;
             if(response.getStatus()<500) {
+            	if (GENERIC_MESSAGE.equals(message)) { // if we didn't get a specific message from the exception
+                	message = "client error";
+            	}
                 responseBuilder = ClientError.status(response.getStatus());
             } else {
                 responseBuilder = ServerError.status(response.getStatus());
