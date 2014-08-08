@@ -4,11 +4,9 @@ package com.ft.api.jaxrs.errors;
 import com.google.common.base.Supplier;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.yammer.dropwizard.testing.ResourceTest;
+import io.dropwizard.testing.junit.ResourceTestRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,6 +17,7 @@ import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -26,12 +25,16 @@ import static org.mockito.Mockito.when;
  *
  * @author Simon.Gibbs
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RuntimeExceptionMapperTest extends ResourceTest {
+public class RuntimeExceptionMapperTest {
 
-    @Mock
-    Supplier<String> mockBusinessLayer;
+	@SuppressWarnings("unchecked")
+    Supplier<String> mockBusinessLayer = mock(Supplier.class);
 
+	@Rule
+	public ResourceTestRule resourceTestRule = ResourceTestRule.builder()
+			.addResource(new MockResource(mockBusinessLayer))
+			.addProvider(RuntimeExceptionMapper.class)
+			.build();
 
     @Test
     public void shouldConvertUnhandledRuntimeExceptions() {
@@ -56,7 +59,7 @@ public class RuntimeExceptionMapperTest extends ResourceTest {
     }
 
     private WebResource.Builder prepClientWithUrl() {
-        return client()
+        return resourceTestRule.client()
                 .resource("/")
                 .accept(MediaType.APPLICATION_JSON_TYPE);
     }
@@ -85,12 +88,6 @@ public class RuntimeExceptionMapperTest extends ResourceTest {
 
         // not sure what Jersey generates, but it should be "method not allowed".
         assertThat(clientResponse.getStatus(),is(405));
-    }
-
-    @Override
-    protected void setUpResources() throws Exception {
-        addResource(new MockResource(mockBusinessLayer));
-        addProvider(RuntimeExceptionMapper.class);
     }
 
     @Path("/")
