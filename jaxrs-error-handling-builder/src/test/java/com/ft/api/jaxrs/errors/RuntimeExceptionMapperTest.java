@@ -1,10 +1,15 @@
 package com.ft.api.jaxrs.errors;
 
 
+import java.net.URI;
+
 import com.google.common.base.Supplier;
+import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+
 import io.dropwizard.testing.junit.ResourceTestRule;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,7 +21,8 @@ import javax.ws.rs.core.Response;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -90,6 +96,19 @@ public class RuntimeExceptionMapperTest {
         assertThat(clientResponse.getStatus(),is(405));
     }
 
+    @Test
+    public void shouldHandleNotFoundExceptions() throws Exception {
+        
+        when(mockBusinessLayer.get()).thenThrow(new NotFoundException(new URI("/nonexistentresource")));
+
+        ClientResponse clientResponse = invokeGetMockResource();
+
+        ErrorEntity result = clientResponse.getEntity(ErrorEntity.class);
+
+        assertThat(result.getMessage(),is("404 Not Found - /nonexistentresource"));
+        assertThat(clientResponse.getStatus(), is(404));
+    }
+    
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public static class MockResource {

@@ -34,8 +34,9 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
     public Response toResponse(RuntimeException exception) {
 
         if(exception instanceof NotFoundException) {
-            LOG.debug("404",exception);
-            return ClientError.status(404).error(exception.getMessage()).response();
+            String message = String.format("404 Not Found - %s", ((NotFoundException)exception).getNotFoundUri());
+            LOG.debug(message);
+            return ClientError.status(404).error(message).response();
         }
 
         if(exception instanceof WebApplicationException) {
