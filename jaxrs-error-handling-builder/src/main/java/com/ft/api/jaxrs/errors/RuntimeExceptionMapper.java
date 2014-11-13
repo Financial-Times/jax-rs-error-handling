@@ -39,12 +39,6 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
             return ClientError.status(404).error(message).response();
         }
 
-        // ensure exceptions are logged!
-        LogLevel logLevel = LogLevel.ERROR;
-        if(exception instanceof WebApplicationServerException) {
-            logLevel = ((WebApplicationServerException) exception).getLevel();
-        }
-        
         if(exception instanceof WebApplicationException) {
             Response response = ((WebApplicationException) exception).getResponse();
 
@@ -68,8 +62,9 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
                 responseBuilder = ClientError.status(response.getStatus());
             } else {
                 responseBuilder = ServerError.status(response.getStatus());
+
                 // ensure server error exceptions are logged!
-                logLevel.logTo(LOG, "Server error: ", exception);
+                LOG.error("Server error: ", exception);
             }
 
             return responseBuilder.error(message).response();

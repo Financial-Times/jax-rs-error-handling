@@ -43,13 +43,13 @@ public class ServerError {
         public WebApplicationServerException exception(Throwable cause) {
             checkNotNull(cause, "optional argument \"cause\" was unexpectedly null."); // surely null is impossible in a catch block!
             logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
-            return new WebApplicationServerException(cause, response());
+            return new WebApplicationServerException(cause, response(), logLevel);
         }
 
         @Override
         public WebApplicationServerException exception() {
             logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()));
-            return new WebApplicationServerException(response());
+            return new WebApplicationServerException(null, response(), logLevel);
         }
 
 

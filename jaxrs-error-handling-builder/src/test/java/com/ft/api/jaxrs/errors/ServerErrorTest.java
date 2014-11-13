@@ -1,6 +1,11 @@
 package com.ft.api.jaxrs.errors;
 
+import com.sun.jersey.api.client.ClientResponse;
+import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -11,6 +16,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * ServerErrorTest
@@ -89,6 +97,29 @@ public class ServerErrorTest {
     public void shouldRejectStatusCodeBelowRangeAllocatedInRFC() {
         int badCode = (499 - anyNonNegativeInteger());
         ServerError.status(badCode).response();
+    }
+
+
+    @Test
+         public void shouldRespectLogLevel() throws Exception {
+
+        final LogLevel mockLevel = mock(LogLevel.class);
+
+        ServerError.status(500).error("mock failure").logLevel(mockLevel).exception();
+
+        verify(mockLevel,times(1)).logTo(any(Logger.class),anyString());
+
+    }
+
+    @Test
+    public void shouldRespectLogLevelWithCause() throws Exception {
+
+        final LogLevel mockLevel = mock(LogLevel.class);
+
+        ServerError.status(500).error("mock failure").logLevel(mockLevel).exception(new RuntimeException("Synthetic error"));
+
+        verify(mockLevel,times(1)).logTo(any(Logger.class), anyString(), any(Exception.class));
+
     }
 
     private int anyNonNegativeInteger() {

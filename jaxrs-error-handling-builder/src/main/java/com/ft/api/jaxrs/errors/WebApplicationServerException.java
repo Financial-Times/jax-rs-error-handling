@@ -8,6 +8,8 @@ import javax.ws.rs.core.Response;
  *
  * <p>The server may accept the responsibility for a failure when it is unclear where fault lies, or to be diplomatic.</p>
  *
+ *
+ *
  * @author Simon.Gibbs
  */
 public class WebApplicationServerException extends WebApplicationException {

@@ -82,8 +82,21 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
     }
 
 
+    /**
+     * Creates an exception wrapping the configured response and the <code>cause</code>. The exception implements a Jersey
+     * exception type and contains an HTTP response code and body, and therefore any configured exception mapping is
+     * skipped including {@link RuntimeExceptionMapper}.
+     * @param cause
+     * @return an exception, which should be thrown.
+     */
     public abstract E exception(Throwable cause);
 
+    /**
+     * Creates an exception wrapping the configured response. The exception implements a Jersey exception type and
+     * contains an HTTP response code and body, and therefore any configured exception mapping is
+     * skipped including {@link RuntimeExceptionMapper}.
+     * @return an exception, which should be thrown.
+     */
     public abstract E exception();
 
 }
