@@ -15,6 +15,7 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
     private String message;
     private int statusCode;
     private Object context;
+    protected LogLevel logLevel = LogLevel.ERROR;
 
     public AbstractErrorBuilder(int code) {
         checkStatusCode(code);
@@ -56,6 +57,11 @@ public abstract class AbstractErrorBuilder<E, B extends AbstractErrorBuilder> {
 
     public B context(Object context) {
         this.context = context;
+        return (B) this;
+    }
+
+    public B logLevel(LogLevel level) {
+        this.logLevel = level;
         return (B) this;
     }
 
