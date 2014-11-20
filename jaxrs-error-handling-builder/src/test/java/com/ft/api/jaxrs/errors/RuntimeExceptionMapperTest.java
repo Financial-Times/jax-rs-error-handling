@@ -12,7 +12,6 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 
 import org.junit.Rule;
 import org.junit.Test;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,10 +20,10 @@ import javax.ws.rs.core.Response;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 
 /**
  * RuntimeExceptionMapperTest
@@ -108,7 +107,7 @@ public class RuntimeExceptionMapperTest {
         assertThat(result.getMessage(),is("404 Not Found - /nonexistentresource"));
         assertThat(clientResponse.getStatus(), is(404));
     }
-    
+
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public static class MockResource {

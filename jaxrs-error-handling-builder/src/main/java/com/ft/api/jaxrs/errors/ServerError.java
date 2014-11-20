@@ -39,18 +39,17 @@ public class ServerError {
             Preconditions.checkArgument(code>=500,"min server code is 500");
         }
 
-
         @Override
         public WebApplicationServerException exception(Throwable cause) {
             checkNotNull(cause, "optional argument \"cause\" was unexpectedly null."); // surely null is impossible in a catch block!
-            LOGGER.error(String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
+            logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
             return new WebApplicationServerException(cause, response());
         }
 
         @Override
         public WebApplicationServerException exception() {
-            LOGGER.error("message=\"{}\" status=\"{}\"",getMessage(), getStatusCode());
-            return new WebApplicationServerException(response());
+            logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()));
+            return new WebApplicationServerException(null, response());
         }
 
 

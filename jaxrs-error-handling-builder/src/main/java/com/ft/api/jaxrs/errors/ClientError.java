@@ -40,13 +40,13 @@ public class ClientError {
         @Override
         public WebApplicationClientException exception(Throwable cause) {
             checkNotNull(cause, "optional argument \"cause\" was unexpectedly null."); // surely null is impossible in a catch block!
-            LOGGER.warn(String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
+            logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
             return new WebApplicationClientException(cause, response());
         }
 
         @Override
         public WebApplicationClientException exception() {
-            LOGGER.warn("message=\"{}\" status=\"{}\"",getMessage(), getStatusCode());
+            logLevel.logTo(LOGGER,"message=\"{}\" status=\"{}\"",getMessage(), getStatusCode());
             return new WebApplicationClientException(response());
         }
 
