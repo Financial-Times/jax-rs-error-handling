@@ -14,22 +14,12 @@ import javax.ws.rs.core.Response;
  */
 public class WebApplicationServerException extends WebApplicationException {
 
-    private final LogLevel level;
-
     public WebApplicationServerException(Response response) {
-        this(null,response,LogLevel.ERROR);
+        super(null,response);
     }
 
     public WebApplicationServerException(Throwable cause, Response response) {
-        this(cause, response, LogLevel.ERROR);
-    }
-
-    public WebApplicationServerException(Throwable cause, Response response, LogLevel level) {
         super(cause, response);
-        this.level = level;
     }
 
-    public LogLevel getLevel() {
-        return level;
-    }
 }
