@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 public class WebApplicationServerException extends WebApplicationException {
 
     public WebApplicationServerException(Response response) {
-        super(null,response);
+        super(response);
     }
 
     public WebApplicationServerException(Throwable cause, Response response) {

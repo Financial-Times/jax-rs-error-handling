@@ -1,16 +1,11 @@
 package com.ft.api.jaxrs.errors;
 
-import com.sun.jersey.api.client.ClientResponse;
-import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -30,25 +25,25 @@ public class ServerErrorTest {
     @Test
     public void shouldDefaultResponseToJsonMediaType() {
         Response result = ServerError.status(500).response();
-        assertThat((MediaType) result.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE),is(MediaType.APPLICATION_JSON_TYPE));
+        assertThat(result.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE), is(MediaType.APPLICATION_JSON_TYPE));
     }
 
     @Test
     public void shouldIncludeSelectedStatusInResponse() {
         Response result = ServerError.status(503).response();
-        assertThat(result.getStatus(),is(503));
+        assertThat(result.getStatus(), is(503));
     }
 
     @Test
     public void shouldBeAbleToWrapResponseWithAnException() {
         WebApplicationServerException serverException = ServerError.status(502).exception();
-        assertThat(serverException.getResponse().getStatus(),is(502));
+        assertThat(serverException.getResponse().getStatus(), is(502));
     }
 
     @Test
     public void shouldReturnAnEntityOfTypeResourceError() {
         Response result = ServerError.status(503).response();
-        assertThat(result.getEntity(),instanceOf(ErrorEntity.class));
+        assertThat(result.getEntity(), instanceOf(ErrorEntity.class));
     }
 
     @Test(expected = NullPointerException.class)
@@ -101,13 +96,13 @@ public class ServerErrorTest {
 
 
     @Test
-         public void shouldRespectLogLevel() throws Exception {
+    public void shouldRespectLogLevel() throws Exception {
 
         final LogLevel mockLevel = mock(LogLevel.class);
 
         ServerError.status(500).error("mock failure").logLevel(mockLevel).exception();
 
-        verify(mockLevel,times(1)).logTo(any(Logger.class),anyString());
+        verify(mockLevel, times(1)).logTo(any(Logger.class), anyString());
 
     }
 
@@ -118,11 +113,11 @@ public class ServerErrorTest {
 
         ServerError.status(500).error("mock failure").logLevel(mockLevel).exception(new RuntimeException("Synthetic error"));
 
-        verify(mockLevel,times(1)).logTo(any(Logger.class), anyString(), any(Exception.class));
+        verify(mockLevel, times(1)).logTo(any(Logger.class), anyString(), any(Exception.class));
 
     }
 
     private int anyNonNegativeInteger() {
-        return (int) (Math.random()* Integer.MAX_VALUE);
+        return (int) (Math.random() * Integer.MAX_VALUE);
     }
 }
