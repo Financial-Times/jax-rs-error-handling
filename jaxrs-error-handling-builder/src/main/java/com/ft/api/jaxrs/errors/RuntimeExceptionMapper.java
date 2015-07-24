@@ -4,7 +4,6 @@ import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -35,15 +34,9 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
     public Response toResponse(RuntimeException exception) {
 
         if(exception instanceof NotFoundException) {
-            String message = String.format("404 Not Found - %s", exception.getMessage());
+            String message = String.format("404 Not Found");
             LOG.debug(message);
             return ClientError.status(404).error(message).response();
-        }
-
-        if(exception instanceof BadRequestException) {
-            String message = String.format("40 Bad Request - %s", exception.getMessage());
-            LOG.debug(message);
-            return ClientError.status(400).error(message).response();
         }
 
         if(exception instanceof WebApplicationException) {
