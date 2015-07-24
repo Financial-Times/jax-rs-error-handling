@@ -1,6 +1,7 @@
 package com.ft.api.jaxrs.client.exceptions;
 
-import com.google.common.base.Objects;
+
+import com.google.common.base.MoreObjects;
 
 import java.net.URI;
 
@@ -16,7 +17,7 @@ public class ApiException extends RuntimeException {
 
 
     public ApiException(String message, URI uri, String httpMethod) {
-        super(Objects.firstNonNull(message,reportUri(uri)));
+        super(MoreObjects.firstNonNull(message, reportUri(uri)));
         this.uri = uri;
         this.httpMethod = httpMethod;
     }
@@ -46,8 +47,8 @@ public class ApiException extends RuntimeException {
     }
 
 
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects
                 .toStringHelper(this)
                 .add("httpMethod", getMessage())
                 .add("uri", uri);

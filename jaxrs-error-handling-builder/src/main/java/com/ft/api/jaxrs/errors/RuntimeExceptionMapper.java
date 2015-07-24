@@ -1,10 +1,10 @@
 package com.ft.api.jaxrs.errors;
 
-import com.google.common.base.Objects;
-import com.sun.jersey.api.NotFoundException;
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -34,7 +34,7 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
     public Response toResponse(RuntimeException exception) {
 
         if(exception instanceof NotFoundException) {
-            String message = String.format("404 Not Found - %s", ((NotFoundException)exception).getNotFoundUri());
+            String message = "404 Not Found";
             LOG.debug(message);
             return ClientError.status(404).error(message).response();
         }
@@ -48,7 +48,7 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
             }
 
             // fill out null responses
-            String message = Objects.firstNonNull(exception.getMessage(),GENERIC_MESSAGE);
+            String message = MoreObjects.firstNonNull(exception.getMessage(), GENERIC_MESSAGE);
 
             if(!GENERIC_MESSAGE.equals(message)) {
                 // Don't turn this off. You should be using ServerError and ClientError builders.

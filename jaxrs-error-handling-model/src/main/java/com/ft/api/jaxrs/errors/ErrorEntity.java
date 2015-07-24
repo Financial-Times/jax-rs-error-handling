@@ -1,7 +1,7 @@
 package com.ft.api.jaxrs.errors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 /**
  * ErrorEntity
@@ -16,14 +16,14 @@ public class ErrorEntity {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects
                 .toStringHelper(this)
                 .add("message", message);
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     @Override

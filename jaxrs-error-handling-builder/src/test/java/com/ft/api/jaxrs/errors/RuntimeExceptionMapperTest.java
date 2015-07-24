@@ -1,22 +1,19 @@
 package com.ft.api.jaxrs.errors;
 
 
-import java.net.URI;
-
 import com.google.common.base.Supplier;
-import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-
 import io.dropwizard.testing.junit.ResourceTestRule;
-
 import org.junit.Rule;
 import org.junit.Test;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,79 +29,75 @@ import static org.mockito.Mockito.when;
  */
 public class RuntimeExceptionMapperTest {
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     Supplier<String> mockBusinessLayer = mock(Supplier.class);
 
-	@Rule
-	public ResourceTestRule resourceTestRule = ResourceTestRule.builder()
-			.addResource(new MockResource(mockBusinessLayer))
-			.addProvider(RuntimeExceptionMapper.class)
-			.build();
+    @Rule
+    public ResourceTestRule resourceTestRule = ResourceTestRule.builder()
+            .addResource(new MockResource(mockBusinessLayer))
+            .addProvider(RuntimeExceptionMapper.class)
+            .build();
 
     @Test
     public void shouldConvertUnhandledRuntimeExceptions() {
 
         when(mockBusinessLayer.get()).thenThrow(new NullPointerException("synthetic NPE"));
 
-        ClientResponse clientResponse = invokeGetMockResource();
+        Response clientResponse = invokeGetMockResource();
 
-        assertThat(clientResponse.getStatus(),is(500));
-        assertThat(clientResponse.getEntity(ErrorEntity.class),instanceOf(ErrorEntity.class));
+        assertThat(clientResponse.getStatus(), is(500));
+        assertThat(clientResponse.readEntity(ErrorEntity.class), instanceOf(ErrorEntity.class));
 
     }
 
-    private ClientResponse invokeGetMockResource() {
-        return prepClientWithUrl()
-                .get(ClientResponse.class);
+    private Response invokeGetMockResource() {
+        return resourceTestRule.client().target("/")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
     }
 
-    private ClientResponse invokePostMockResource() {
-        return prepClientWithUrl()
-                .post(ClientResponse.class);
-    }
-
-    private WebResource.Builder prepClientWithUrl() {
-        return resourceTestRule.client()
-                .resource("/")
-                .accept(MediaType.APPLICATION_JSON_TYPE);
+    private Response invokePostMockResource() {
+        return resourceTestRule.client().target("/")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .post(Entity.json("test"));
     }
 
     @Test
     public void shouldNotConvertProperlyWrappedExceptions() {
 
-        Response expectedResponse = ClientError.status(422).error("some error").response();
+        Response expectedResponse = Response.status(422).entity(new ErrorEntity("some error")).build();
         ErrorEntity expectedEntity = (ErrorEntity) expectedResponse.getEntity();
 
         when(mockBusinessLayer.get()).thenThrow(new WebApplicationClientException(expectedResponse));
 
-        ClientResponse clientResponse = invokeGetMockResource();
+        Response clientResponse = invokeGetMockResource();
 
-        ErrorEntity result = clientResponse.getEntity(ErrorEntity.class);
+        ErrorEntity result = clientResponse.readEntity(ErrorEntity.class);
 
-        assertThat(result.getMessage(),is(expectedEntity.getMessage()));
-        assertThat(clientResponse.getStatus(),is(422));
+        assertThat(result.getMessage(), is(expectedEntity.getMessage()));
+        assertThat(clientResponse.getStatus(), is(422));
 
     }
 
     @Test
     public void shouldNotChangeStatusCodeForMappingFailures() {
 
-        ClientResponse clientResponse = invokePostMockResource();
+        Response clientResponse = invokePostMockResource();
 
         // not sure what Jersey generates, but it should be "method not allowed".
-        assertThat(clientResponse.getStatus(),is(405));
+        assertThat(clientResponse.getStatus(), is(405));
     }
 
     @Test
     public void shouldHandleNotFoundExceptions() throws Exception {
-        
-        when(mockBusinessLayer.get()).thenThrow(new NotFoundException(new URI("/nonexistentresource")));
 
-        ClientResponse clientResponse = invokeGetMockResource();
+        when(mockBusinessLayer.get()).thenThrow(new NotFoundException(new URI("/nonexistentresource").toString()));
 
-        ErrorEntity result = clientResponse.getEntity(ErrorEntity.class);
+        Response clientResponse = invokeGetMockResource();
 
-        assertThat(result.getMessage(),is("404 Not Found - /nonexistentresource"));
+        ErrorEntity result = clientResponse.readEntity(ErrorEntity.class);
+
+        assertThat(result.getMessage(), is("404 Not Found - /nonexistentresource"));
         assertThat(clientResponse.getStatus(), is(404));
     }
 
