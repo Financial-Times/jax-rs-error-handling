@@ -97,7 +97,7 @@ public class RuntimeExceptionMapperTest {
 
         ErrorEntity result = clientResponse.readEntity(ErrorEntity.class);
 
-        assertThat(result.getMessage(), is("404 Not Found - /nonexistentresource"));
+        assertThat(result.getMessage(), is("404 Not Found"));
         assertThat(clientResponse.getStatus(), is(404));
     }
 
