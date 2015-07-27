@@ -20,7 +20,7 @@
     <properties>
         <guava.version>18.0</guava.version>
         <jackson-annotations.version>2.5.3</jackson-annotations.version>
-        <jersey-server.version>2.19</jersey-server.version>
+        <jersey-server.version>2.17</jersey-server.version>
         <junit.version>4.12</junit.version>
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <dropwizard.version>0.8.1</dropwizard.version>
