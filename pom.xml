@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
@@ -15,13 +14,14 @@
 
     <groupId>com.ft</groupId>
     <artifactId>jaxrs-error-handling</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.2</version>
 
     <scm>
         <url>http://git.svc.ft.com:8080/projects/APILIBS/repos/jax-rs-error-handling/browse</url>
         <connection>scm:git:ssh://git@git.svc.ft.com:7999/apilibs/jax-rs-error-handling.git</connection>
         <developerConnection>scm:git:ssh://git@git.svc.ft.com:7999/apilibs/jax-rs-error-handling.git</developerConnection>
-    </scm>
+      <tag>jaxrs-error-handling-2.0.2</tag>
+  </scm>
 
     <properties>
         <guava.version>18.0</guava.version>
