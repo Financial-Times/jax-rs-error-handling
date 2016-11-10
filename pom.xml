@@ -6,29 +6,10 @@
         <module>jaxrs-error-handling-model</module>
         <module>jaxrs-error-handling-builder</module>
     </modules>
-    <parent>
-        <groupId>com.ft.parent</groupId>
-        <artifactId>parentPom</artifactId>
-        <version>2.12</version>
-    </parent>
 
     <groupId>com.ft</groupId>
     <artifactId>jaxrs-error-handling</artifactId>
     <version>1.1.0</version>
-
-    <repositories>
-        <repository>
-            <id>ft-releases</id>
-            <url>http://anthill.svc.ft.com:8081/nexus/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
 
     <dependencyManagement>
         <dependencies>
