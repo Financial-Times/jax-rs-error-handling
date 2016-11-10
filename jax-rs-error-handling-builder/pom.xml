@@ -2,19 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.github.Financial-Times</groupId>
-        <artifactId>jaxrs-error-handling</artifactId>
-        <version>2.0.4</version>
+        <artifactId>jax-rs-error-handling</artifactId>
+        <version>2.0.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ft.jaxrs-error-handling</groupId>
-    <artifactId>jaxrs-error-handling-builder</artifactId>
+    <artifactId>jax-rs-error-handling-builder</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>com.ft.jaxrs-error-handling</groupId>
-            <artifactId>jaxrs-error-handling-model</artifactId>
+            <groupId>com.github.Financial-Times</groupId>
+            <artifactId>jax-rs-error-handling-model</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
