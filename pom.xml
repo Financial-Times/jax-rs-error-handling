@@ -6,15 +6,9 @@
         <module>jaxrs-error-handling-builder</module>
     </modules>
 
-    <parent>
-        <groupId>com.ft.parent</groupId>
-        <artifactId>parentPom</artifactId>
-        <version>2.12</version>
-    </parent>
-
     <groupId>com.ft</groupId>
     <artifactId>jaxrs-error-handling</artifactId>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.3</version>
 
     <scm>
         <url>http://git.svc.ft.com:8080/projects/APILIBS/repos/jax-rs-error-handling/browse</url>
@@ -33,23 +27,7 @@
         <target-jdk>1.7</target-jdk>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     </properties>
-
-    <repositories>
-        <repository>
-            <id>ft-releases</id>
-            <url>http://anthill.svc.ft.com:8081/nexus/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>
