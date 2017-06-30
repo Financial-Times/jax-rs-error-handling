@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -40,7 +42,9 @@ public class ClientError {
         @Override
         public WebApplicationClientException exception(Throwable cause) {
             checkNotNull(cause, "optional argument \"cause\" was unexpectedly null."); // surely null is impossible in a catch block!
-            logLevel.logTo(LOGGER,String.format("message=\"%s\" status=\"%d\"",getMessage(), getStatusCode()), cause);
+            if (getStatusCode() != Response.Status.NOT_FOUND.getStatusCode()) {
+                logLevel.logTo(LOGGER, String.format("message=\"%s\" status=\"%d\"", getMessage(), getStatusCode()), cause);
+            }
             return new WebApplicationClientException(cause, response());
         }
 
