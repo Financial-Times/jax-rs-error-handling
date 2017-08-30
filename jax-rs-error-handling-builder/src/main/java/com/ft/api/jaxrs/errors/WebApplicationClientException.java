@@ -18,4 +18,8 @@ public class WebApplicationClientException extends WebApplicationException {
         super(cause, response);
     }
 
+    public WebApplicationClientException(String message, Throwable cause, Response response) {
+        super(message, cause, response);
+    }
+
 }
