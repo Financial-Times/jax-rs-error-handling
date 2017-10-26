@@ -8,6 +8,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.net.SocketTimeoutException;
 
 /**
  * RuntimeExceptionMapper
@@ -68,6 +69,8 @@ public class RuntimeExceptionMapper  implements ExceptionMapper<RuntimeException
             }
 
             return responseBuilder.error(message).response();
+        } else if (exception.getCause() instanceof SocketTimeoutException) {
+            return ServerError.status(504).exception(exception).getResponse();
         }
 
         /* Force a standard response for unexpected error types.

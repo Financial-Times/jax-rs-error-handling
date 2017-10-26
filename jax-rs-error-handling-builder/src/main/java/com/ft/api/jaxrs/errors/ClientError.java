@@ -45,7 +45,7 @@ public class ClientError {
             if (getStatusCode() != Response.Status.NOT_FOUND.getStatusCode()) {
                 logLevel.logTo(LOGGER, String.format("message=\"%s\" status=\"%d\"", getMessage(), getStatusCode()), cause);
             }
-            return new WebApplicationClientException(cause, response());
+            return new WebApplicationClientException(cause.toString(), cause, response());
         }
 
         @Override

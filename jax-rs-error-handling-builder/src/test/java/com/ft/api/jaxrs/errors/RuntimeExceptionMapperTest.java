@@ -9,10 +9,12 @@ import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -46,6 +48,18 @@ public class RuntimeExceptionMapperTest {
         Response clientResponse = invokeGetMockResource();
 
         assertThat(clientResponse.getStatus(), is(500));
+        assertThat(clientResponse.readEntity(ErrorEntity.class), instanceOf(ErrorEntity.class));
+
+    }
+
+    @Test
+    public void shouldConvertProcessingExceptionsThatWithSocketTimeoutExceptionCause() {
+
+        when(mockBusinessLayer.get()).thenThrow(new ProcessingException(new SocketTimeoutException()));
+
+        Response clientResponse = invokeGetMockResource();
+
+        assertThat(clientResponse.getStatus(), is(504));
         assertThat(clientResponse.readEntity(ErrorEntity.class), instanceOf(ErrorEntity.class));
 
     }
