@@ -1,5 +1,8 @@
 package com.ft.api.jaxrs.errors;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import com.ft.api.jaxrs.errors.entities.ErrorEntityFactory;
 import org.junit.After;
 import org.junit.Before;
@@ -7,11 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * CustomisedErrorEntityTest
@@ -21,100 +19,88 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CustomisedErrorEntityTest {
 
+  /** An arbitrary integer between 400 and 499 - the assigned range for client errors. */
+  public static final int CLIENT_CODE = 401;
 
-    /**
-     * An arbitrary integer between 400 and 499 - the assigned range for client errors.
-     */
-    public static final int CLIENT_CODE = 401;
+  /** An arbitrary integer between 500 and 599 - the assigned range for server errors. */
+  private static final int SERVER_CODE = 503;
 
-    /**
-     * An arbitrary integer between 500 and 599 - the assigned range for server errors.
-     */
-    private static final int SERVER_CODE = 503;
+  @Mock ErrorEntityFactory mockFactory;
 
-    @Mock
-    ErrorEntityFactory mockFactory;
+  @Before
+  public void setUp() {
+    Errors.customise(mockFactory);
+  }
 
-    @Before
-    public void setUp() {
-        Errors.customise(mockFactory);
-    }
+  @After
+  public void tearDown() {
+    Errors.resetCustomisation();
+  }
 
-    @After
-    public void tearDown() {
-        Errors.resetCustomisation();
-    }
+  @Test
+  public void shouldCallEntityFactoryToPrepareServerErrorEntity() {
 
-    @Test
-    public void shouldCallEntityFactoryToPrepareServerErrorEntity() {
+    givenFactoryWillReturnAnErrorEntity();
 
-        givenFactoryWillReturnAnErrorEntity();
+    ServerError.status(SERVER_CODE).response();
 
-        ServerError.status(SERVER_CODE).response();
+    verify(mockFactory).entity(anyString(), any());
+  }
 
-        verify(mockFactory).entity(anyString(),any());
-    }
+  @Test
+  public void shouldCallEntityFactoryToPrepareClientErrorEntity() {
 
+    givenFactoryWillReturnAnErrorEntity();
 
-    @Test
-    public void shouldCallEntityFactoryToPrepareClientErrorEntity() {
+    ClientError.status(CLIENT_CODE).response();
 
-        givenFactoryWillReturnAnErrorEntity();
+    verify(mockFactory).entity(anyString(), any());
+  }
 
-        ClientError.status(CLIENT_CODE).response();
+  @Test
+  public void shouldAllowResetBackToDefault() {
 
-        verify(mockFactory).entity(anyString(),any());
+    Errors.resetCustomisation();
 
-    }
+    ServerError.status(SERVER_CODE).response();
 
-    @Test
-    public void shouldAllowResetBackToDefault() {
+    verify(mockFactory, never()).entity(anyString(), any());
+  }
 
-        Errors.resetCustomisation();
+  @Test
+  public void entityFactoryShouldReceiveContextFromBuilder() {
+    givenFactoryWillReturnAnErrorEntity();
 
-        ServerError.status(SERVER_CODE).response();
+    Object someContext = new Object();
 
-        verify(mockFactory,never()).entity(anyString(),any());
+    ClientError.status(CLIENT_CODE).context(someContext).response();
 
-    }
+    verify(mockFactory).entity(anyString(), same(someContext));
+  }
 
-    @Test
-    public void entityFactoryShouldReceiveContextFromBuilder() {
-        givenFactoryWillReturnAnErrorEntity();
+  @Test
+  public void entityFactoryShouldReceiveMessageFromBuilder() {
+    givenFactoryWillReturnAnErrorEntity();
 
-        Object someContext = new Object();
+    String message = "some message";
 
-        ClientError.status(CLIENT_CODE).context(someContext).response();
+    ServerError.status(SERVER_CODE).error(message).response();
 
-        verify(mockFactory).entity(anyString(),same(someContext));
-    }
+    verify(mockFactory).entity(same(message), any());
+  }
 
-    @Test
-    public void entityFactoryShouldReceiveMessageFromBuilder() {
-        givenFactoryWillReturnAnErrorEntity();
+  @Test(expected = NullPointerException.class)
+  public void entityFactoryMustProduceAnEntity() {
+    givenFactoryWillFailToReturnAnErrorEntity();
 
-        String message = "some message";
+    ClientError.status(CLIENT_CODE).response();
+  }
 
-        ServerError.status(SERVER_CODE).error(message).response();
+  private void givenFactoryWillReturnAnErrorEntity() {
+    when(mockFactory.entity(anyString(), any())).thenReturn(new ErrorEntity("some error"));
+  }
 
-        verify(mockFactory).entity(same(message),any());
-    }
-
-
-    @Test(expected = NullPointerException.class)
-    public void entityFactoryMustProduceAnEntity() {
-        givenFactoryWillFailToReturnAnErrorEntity();
-
-        ClientError.status(CLIENT_CODE).response();
-
-    }
-
-    private void givenFactoryWillReturnAnErrorEntity() {
-        when(mockFactory.entity(anyString(), any())).thenReturn(new ErrorEntity("some error"));
-    }
-
-    private void givenFactoryWillFailToReturnAnErrorEntity() {
-        when(mockFactory.entity(anyString(),any())).thenReturn(null);
-    }
-
+  private void givenFactoryWillFailToReturnAnErrorEntity() {
+    when(mockFactory.entity(anyString(), any())).thenReturn(null);
+  }
 }

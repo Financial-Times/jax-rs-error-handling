@@ -10,21 +10,21 @@ import com.ft.api.jaxrs.errors.entities.ErrorEntityFactory;
  */
 public class Errors {
 
-    private static ErrorEntityFactory entityFactory;
+  private static ErrorEntityFactory entityFactory;
 
-    static {
-        resetCustomisation();
-    }
+  static {
+    resetCustomisation();
+  }
 
-    public static void customise(ErrorEntityFactory factory) {
-        entityFactory = factory;
-    }
+  public static void customise(ErrorEntityFactory factory) {
+    entityFactory = factory;
+  }
 
-    public static void resetCustomisation() {
-        entityFactory = new DefaultErrorEntityFactory();
-    }
+  public static void resetCustomisation() {
+    entityFactory = new DefaultErrorEntityFactory();
+  }
 
-    public static ErrorEntity buildEntity(String message, Object context) {
-        return entityFactory.entity(message,context);
-    }
+  public static ErrorEntity buildEntity(String message, Object context) {
+    return entityFactory.entity(message, context);
+  }
 }
