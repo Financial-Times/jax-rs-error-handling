@@ -1,0 +1,51 @@
+version: 2.1
+
+executors:
+  maven:
+    docker:
+      - image: maven:3.6-jdk-11
+
+workflows:
+  test-and-build:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - publish-nexus:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+
+jobs:
+  build:
+    working_directory: ~/jax-rs-error-handling
+    executor: maven
+    steps:
+      - checkout
+      - run:
+          name: Maven Verify
+          command: |
+            mkdir /root/.m2/
+            curl -v -o /root/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
+            mvn clean verify
+            rm -rf /root/.m2/*
+  publish-nexus:
+    working_directory: ~/jax-rs-error-handling
+    executor: maven
+    steps:
+      - checkout:
+          path: ~/jax-rs-error-handling
+      - run:
+          name: Publish Tag to Nexus repository
+          command: |
+            mkdir /root/.m2/
+            curl -v -o /root/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
+            mvn versions:set -DnewVersion=${CIRCLE_TAG}
+            mvn versions:commit
+            mvn deploy
+            rm -rf /root/.m2/*

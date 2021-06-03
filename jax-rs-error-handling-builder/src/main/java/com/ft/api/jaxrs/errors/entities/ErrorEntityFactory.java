@@ -9,6 +9,5 @@ import com.ft.api.jaxrs.errors.ErrorEntity;
  */
 public interface ErrorEntityFactory {
 
-    public ErrorEntity entity(String message, Object context);
-
+  ErrorEntity entity(String message, Object context);
 }

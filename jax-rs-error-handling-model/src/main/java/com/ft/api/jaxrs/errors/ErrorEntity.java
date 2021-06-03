@@ -10,24 +10,22 @@ import com.google.common.base.MoreObjects;
  */
 public class ErrorEntity {
 
-    private final String message;
+  private final String message;
 
-    public ErrorEntity(@JsonProperty("message") String message) {
-        this.message = message;
-    }
+  public ErrorEntity(@JsonProperty("message") String message) {
+    this.message = message;
+  }
 
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return MoreObjects
-                .toStringHelper(this)
-                .add("message", message);
-    }
+  protected MoreObjects.ToStringHelper toStringHelper() {
+    return MoreObjects.toStringHelper(this).add("message", message);
+  }
 
-    public String getMessage() {
-        return message;
-    }
+  public String getMessage() {
+    return message;
+  }
 
-    @Override
-    public String toString() {
-        return toStringHelper().toString();
-    }
+  @Override
+  public String toString() {
+    return toStringHelper().toString();
+  }
 }
