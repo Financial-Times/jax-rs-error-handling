@@ -3,7 +3,8 @@ version: 2.1
 executors:
   maven:
     docker:
-      - image: maven:3.6-jdk-11
+      - image: cimg/openjdk:11.0.26
+        user: root
 
 workflows:
   test-and-build:
@@ -12,7 +13,10 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - publish-nexus:
+          context:
+            - cm-cloudsmith
+            - cm-team-github
+      - publish-cloudsmith:
           requires:
             - build
           filters:
@@ -20,10 +24,13 @@ workflows:
               ignore: /.*/
             tags:
               only: /^\d+\.\d+\.\d+$/
+          context:
+            - cm-cloudsmith
+            - cm-team-github
 
 jobs:
   build:
-    working_directory: ~/jax-rs-error-handling
+    working_directory: ~/jax-rs-build-info-resource
     executor: maven
     steps:
       - checkout
@@ -31,20 +38,20 @@ jobs:
           name: Maven Verify
           command: |
             mkdir /root/.m2/
-            curl -v -o /root/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
-            mvn clean verify
+            curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3.raw" -v -o ~/.m2/settings.xml -L "https://raw.githubusercontent.com/Financial-Times/cloudsmith-settings/main/public-settings.xml"
+            mvn clean verify jacoco:report coveralls:report -DrepoToken=${COVERALLS_TOKEN}
             rm -rf /root/.m2/*
-  publish-nexus:
-    working_directory: ~/jax-rs-error-handling
+  publish-cloudsmith:
+    working_directory: ~/jax-rs-build-info-resource
     executor: maven
     steps:
       - checkout:
-          path: ~/jax-rs-error-handling
+          path: ~/jax-rs-build-info-resource
       - run:
-          name: Publish Tag to Nexus repository
+          name: Publish Tag to CloudSmith repository
           command: |
             mkdir /root/.m2/
-            curl -v -o /root/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
+            curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3.raw" -v -o ~/.m2/settings.xml -L "https://raw.githubusercontent.com/Financial-Times/cloudsmith-settings/main/public-settings.xml"
             mvn versions:set -DnewVersion=${CIRCLE_TAG}
             mvn versions:commit
             mvn deploy
